@@ -1,0 +1,5 @@
+.DS_Store
+*.sig
+__pycache__
+past_loadable
+*.swp
