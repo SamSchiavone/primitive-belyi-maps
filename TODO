@@ -1,6 +1,6 @@
 TODO:
 
-1) Make (Magma, probably) function that, given a permutation triple, returns the associated primitive permutation triple.
+1) Make (Magma, probably) function that, given a permutation triple, returns the associated primitive permutation triple - maybe did this
 
 2) A lookup function in Sage/Python that takes a label of a Belyi map and finds the label of its primitivization. Probably want to do a search on monodromy group and partitions, and then use IsConjugate(Sym(d),our_triple, lmfdb_triple) to determine the match (up to simultaneous conjugacy) 
 
