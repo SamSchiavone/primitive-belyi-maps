@@ -63,14 +63,15 @@ def find_prim_record(search_dicts, sigmas_prim, d):
                 return rec
 
 #THIS FUNCTION IS NOT RIGHT -- IDK HOW TO CHECK IF EVERYTHING IS CONJUGATE BY SAME ELEMENT
-def are_conjugate(triples, sigmas_prim, d):
+def are_conjugate(triples, sigmas_prim):
 	"""
 	Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps)
-		d where the symmetric group is S_d
 	Returns True if conjugate, False else
 	"""	
+    S = sigmas_prim[0].parent()
+    d = S.degree()
 	Sd_magma = magma.SymmetricGroup(d)
-	val = str( magma.IsConjugate(Sd_magma, triples, sigmas_prim) )
+	val = str( magma.IsConjugate(Sd_magma, make_magma_sigmas(triples), make_magma_sigmas(sigmas_prim)) )
 	if val != "true":
 			return False
 	return True
