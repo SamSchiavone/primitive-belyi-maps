@@ -1,5 +1,5 @@
 def look_up_primitivization(record):
-	#1) Compute primitivization (using Katie's Magma code)
+    #1) Compute primitivization (using Katie's Magma code)
     #
 
     #2) Make search dicts using primitivization
@@ -8,8 +8,8 @@ def look_up_primitivization(record):
     #search_dicts = make_search_dicts(group_id, lambdas)
 
     #3) Find primitivization's record -- requires are_conjugate to work
-	#magma_sigmas = ?
-	return
+        #magma_sigmas = ?
+        return
 
 def make_sage_sigmas(magma_sigmas):
     sigma_list = list(magma_sigmas)
@@ -29,18 +29,18 @@ def make_search_data(sigmas_new):
 
 #NEW (AFTER CODING SESSION ON MONDAY 05-10)
 def make_search_dicts(group_id, lambdas):
-	"""
-	Input: group_id (format "xTy"), lambdas ("lambdas")
-	Returns list of  6 search dicts with permutations of sigmas_new
-	"""
-	L = []
-	lambdas.sort()
-	a = lambdas[0]
-	b = lambdas[1]
-	c = lambdas[2]
-	for perm in [[a,b,c], [a,c,b], [b,a,c], [b,c,a], [c,a,b], [c,b,a]]:
-		L.append({"group": group_id, "lambdas":perm})
-	return L
+    """
+    Input: group_id (format "xTy"), lambdas ("lambdas")
+    Returns list of  6 search dicts with permutations of sigmas_new
+    """
+    L = []
+    lambdas.sort()
+    a = lambdas[0]
+    b = lambdas[1]
+    c = lambdas[2]
+    for perm in [[a,b,c], [a,c,b], [b,a,c], [b,c,a], [c,a,b], [c,b,a]]:
+        L.append({"group": group_id, "lambdas":perm})
+    return L
 
 
 def find_prim_record(search_dicts, sigmas_prim, d):
@@ -64,14 +64,14 @@ def find_prim_record(search_dicts, sigmas_prim, d):
 
 #THIS FUNCTION IS NOT RIGHT -- IDK HOW TO CHECK IF EVERYTHING IS CONJUGATE BY SAME ELEMENT
 def are_conjugate(triples, sigmas_prim):
-	"""
-	Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps)
-	Returns True if conjugate, False else
-	"""	
+    """
+    Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps)
+    Returns True if conjugate, False else
+    """	
     S = sigmas_prim[0].parent()
     d = S.degree()
-	Sd_magma = magma.SymmetricGroup(d)
-	val = str( magma.IsConjugate(Sd_magma, make_magma_sigmas(triples), make_magma_sigmas(sigmas_prim)) )
-	if val != "true":
-			return False
-	return True
+    Sd_magma = magma.SymmetricGroup(d)
+    val = str( magma.IsConjugate(Sd_magma, make_magma_sigmas(triples), make_magma_sigmas(sigmas_prim)) )
+    if val != "true":
+        return False
+    return True
