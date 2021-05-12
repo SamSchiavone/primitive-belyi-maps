@@ -16,6 +16,12 @@ def make_sage_sigmas(magma_sigmas):
     sigmas_new = [Permutation(str(el)) for el in sigma_list]
     return sigmas_new
 
+def make_magma_sigmas(sigma_sage):
+    S = sigma_sage[0].parent()
+    d = S.degree()
+    magma_string = '[Sym(%s) | %s, %s, %s]' % (d, sigma_sage[0], sigma_sage[1], sigma_sage[2])
+    return magma(magma_string)
+
 def make_search_data(sigmas_new):
     group_id = magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
     return ([el.cycle_type() for el in sigmas_new], group_id)
