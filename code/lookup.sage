@@ -4,12 +4,13 @@ def look_up_primitivization(record):
 	return
 
 def make_sage_sigmas(magma_sigmas):
-	sigma_list = list(magma_sigmas)
-	sigmas_new = [Permutation(str(el)) for el in sigma_list]
-	return sigmas_new
+    sigma_list = list(magma_sigmas)
+    sigmas_new = [Permutation(str(el)) for el in sigma_list]
+    return sigmas_new
 
-def make_search_data(sigmas_new): #can we rename make_lambdas(sigmas_new)?
-	return [el.cycle_type() for el in sigmas_new]
+def make_search_data(sigmas_new):
+    # magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
+    return [el.cycle_type() for el in sigmas_new]
 
 
 
