@@ -1,5 +1,13 @@
 def look_up_primitivization(record):
-	#do something with Primitivization in magma?
+	#1) Compute primitivization (using Katie's Magma code)
+    #
+
+    #2) Make search dicts using primitivization
+    #group_id = make_search_data(sigmas_new)[1]
+    #lambdas = make_search_data(sigmas_new)[0]
+    #search_dicts = make_search_dicts(group_id, lambdas)
+
+    #3) Find primitivization's record -- requires are_conjugate to work
 	#magma_sigmas = ?
 	return
 
@@ -9,9 +17,8 @@ def make_sage_sigmas(magma_sigmas):
     return sigmas_new
 
 def make_search_data(sigmas_new):
-    # magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
-    return [el.cycle_type() for el in sigmas_new]
-
+    group_id = magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
+    return ([el.cycle_type() for el in sigmas_new], group_id)
 
 
 #NEW (AFTER CODING SESSION ON MONDAY 05-10)
@@ -29,21 +36,25 @@ def make_search_dicts(group_id, lambdas):
 		L.append({"group": group_id, "lambdas":perm})
 	return L
 
-#SOMEHOW MUST GET TO LMFDB : from lmfdb import db
 
 def find_prim_record(search_dicts, sigmas_prim, d):
-	"""
-	Input search_dicts (list of search dicts as in make_search_dicts),
-		sigmas_prim (desired triple, in [] permutation notation),
-		d where the symmetric group of sigmas_prim is S_d
-	Returns corresponding record
-	"""
-	for D in search_dicts:
-		possible_records = list(db.belyi_galmaps.search(D))
-		for rec in possible_records:
-			triples = rec['triples'][0]
-			if are_conjugate(triples, sigmas_prim, d): #??
-				return rec
+    """
+    Input search_dicts (list of search dicts as in make_search_dicts),
+        sigmas_prim (desired triple, in [] permutation notation),
+        d where the symmetric group of sigmas_prim is S_d
+    Returns corresponding record
+    """
+    #open lmfdb -- only works on my computer though
+    import os
+    os.chdir("/scratch/home/ahoey/lmfdb")
+    from lmfdb import db    
+
+    for D in search_dicts:
+        possible_records = list(db.belyi_galmaps.search(D))
+        for rec in possible_records:
+            triples = rec['triples'][0]
+            if are_conjugate(triples, sigmas_prim, d): #??
+                return rec
 
 #THIS FUNCTION IS NOT RIGHT -- IDK HOW TO CHECK IF EVERYTHING IS CONJUGATE BY SAME ELEMENT
 def are_conjugate(triples, sigmas_prim, d):
@@ -53,8 +64,7 @@ def are_conjugate(triples, sigmas_prim, d):
 	Returns True if conjugate, False else
 	"""	
 	Sd_magma = magma.SymmetricGroup(d)
-	for i in range(3):
-		val = str( magma.IsConjugate(Sd_magma, triples[i], sigmas_prim[i]) )
-		if val != "true":
+	val = str( magma.IsConjugate(Sd_magma, triples, sigmas_prim) )
+	if val != "true":
 			return False
 	return True
