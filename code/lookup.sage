@@ -37,7 +37,7 @@ def make_magma_sigmas(sigma_sage):
 def make_search_data(sigmas_new):
     group_id = magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
     group_str = "%sT%s" % group_id
-    return {"group":group_str, "lambdas":[el.cycle_type() for el in sigmas_new]}
+    return ([el.cycle_type() for el in sigmas_new], group_id)
 
 #NEW (AFTER CODING SESSION ON MONDAY 05-10)
 def make_search_dicts(group_id, lambdas):
