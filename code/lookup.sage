@@ -1,8 +1,10 @@
 def look_up_primitivization(record):
+    d = record["deg"]    
+
     #1) Compute primitivization (using Katie's Magma code)
     sigmas_orig_str = record["triples"][0]
     sigmas_orig = [Permutation(elt) for elt in sigmas_orig_str]
-    sigmas_orig_magma = make_magma_sigmas(sigmas_orig)
+    sigmas_orig_magma = make_magma_sigmas(sigmas_orig, d)
 
     magma.load("primitivize.m")
     sigmas_prim_magma = sigmas_prim = magma.Primitivize(sigmas_orig_magma)
@@ -14,7 +16,7 @@ def look_up_primitivization(record):
     search_dicts = make_search_dicts(group_id, lambdas)
 
     #3) Find primitivization's record -- requires are_conjugate to work
-    new_rec = find_prim_record(search_dicts, sigmas_prim)
+    new_rec = find_prim_record(search_dicts, sigmas_prim, d)
     return new_rec
 
 def make_sage_sigmas(magma_sigmas):
@@ -23,10 +25,10 @@ def make_sage_sigmas(magma_sigmas):
     return sigmas_new
 
 #Here, sigma_sage is formatted as [Permutation, Permutation, Permutation]
-def make_magma_sigmas(sigma_sage):
-    S = sigma_sage[0].parent()
-    d = S.degree()
-    print(d)
+def make_magma_sigmas(sigma_sage, d):
+    #S = sigma_sage[0].parent()
+    #d = S.degree()
+    #print(d)
     magma_string = '[Sym(%s) | %s, %s, %s]' % (d, sigma_sage[0], sigma_sage[1], sigma_sage[2])
     return magma(magma_string)
 
@@ -51,7 +53,7 @@ def make_search_dicts(group_id, lambdas):
     return L
 
 
-def find_prim_record(search_dicts, sigmas_prim):
+def find_prim_record(search_dicts, sigmas_prim, d):
     """
     Input search_dicts (list of search dicts as in make_search_dicts),
         sigmas_prim (desired triple, in [] permutation notation),
@@ -67,16 +69,16 @@ def find_prim_record(search_dicts, sigmas_prim):
         possible_records = list(db.belyi_galmaps.search(D))
         for rec in possible_records:
             triples = rec['triples'][0]
-            if are_conjugate(triples, sigmas_prim): #??
+            if are_conjugate(triples, sigmas_prim, d): #??
                 return rec
 
-def are_conjugate(triples, sigmas_prim):
+def are_conjugate(triples, sigmas_prim, d):
     """
-    Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps)
+    Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps), d = degree
     Returns True if conjugate, False else
     """	
-    S = sigmas_prim[0].parent()
-    d = S.degree()
+    #S = sigmas_prim[0].parent()
+    #d = S.degree()
     Sd_magma = magma.SymmetricGroup(d)
     val = str( magma.IsConjugate(Sd_magma, make_magma_sigmas(triples), make_magma_sigmas(sigmas_prim)) )
     if val != "true":
