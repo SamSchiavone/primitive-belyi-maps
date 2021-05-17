@@ -1,24 +1,32 @@
 def look_up_primitivization(record):
     #1) Compute primitivization (using Katie's Magma code)
-    #
+    sigmas_orig_str = record["triples"][0]
+    sigmas_orig = [Permutation(elt) for elt in sigmas_orig_str]
+    sigmas_orig_magma = make_magma_sigmas(sigmas_orig)
+
+    magma.load("primitivize.m")
+    sigmas_prim_magma = sigmas_prim = magma.Primitivize(sigmas_orig_magma)
+    sigmas_prim = make_sage_sigmas(sigmas_prim_magma)
 
     #2) Make search dicts using primitivization
-    #group_id = make_search_data(sigmas_new)[1]
-    #lambdas = make_search_data(sigmas_new)[0]
-    #search_dicts = make_search_dicts(group_id, lambdas)
+    group_id = make_search_data(sigmas_prim)[1]
+    lambdas = make_search_data(sigmas_prim)[0]
+    search_dicts = make_search_dicts(group_id, lambdas)
 
     #3) Find primitivization's record -- requires are_conjugate to work
-        #magma_sigmas = ?
-        return
+    new_rec = find_prim_record(search_dicts, sigmas_prim)
+    return new_rec
 
 def make_sage_sigmas(magma_sigmas):
     sigma_list = list(magma_sigmas)
     sigmas_new = [Permutation(str(el)) for el in sigma_list]
     return sigmas_new
 
+#Here, sigma_sage is formatted as [Permutation, Permutation, Permutation]
 def make_magma_sigmas(sigma_sage):
     S = sigma_sage[0].parent()
     d = S.degree()
+    print(d)
     magma_string = '[Sym(%s) | %s, %s, %s]' % (d, sigma_sage[0], sigma_sage[1], sigma_sage[2])
     return magma(magma_string)
 
@@ -43,7 +51,7 @@ def make_search_dicts(group_id, lambdas):
     return L
 
 
-def find_prim_record(search_dicts, sigmas_prim, d):
+def find_prim_record(search_dicts, sigmas_prim):
     """
     Input search_dicts (list of search dicts as in make_search_dicts),
         sigmas_prim (desired triple, in [] permutation notation),
@@ -59,10 +67,9 @@ def find_prim_record(search_dicts, sigmas_prim, d):
         possible_records = list(db.belyi_galmaps.search(D))
         for rec in possible_records:
             triples = rec['triples'][0]
-            if are_conjugate(triples, sigmas_prim, d): #??
+            if are_conjugate(triples, sigmas_prim): #??
                 return rec
 
-#THIS FUNCTION IS NOT RIGHT -- IDK HOW TO CHECK IF EVERYTHING IS CONJUGATE BY SAME ELEMENT
 def are_conjugate(triples, sigmas_prim):
     """
     Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps)
