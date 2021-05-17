@@ -24,6 +24,10 @@ def make_sage_sigmas(magma_sigmas):
 
 #Here, sigma_sage is formatted as [Permutation, Permutation, Permutation]
 def make_magma_sigmas(sigma_sage):
+    """
+    Input: a list of 3 (Sage) permutations
+    Output: a Magma object of the 3 permutations
+    """
     S = sigma_sage[0].parent()
     d = S.degree()
     print(d)
@@ -32,8 +36,8 @@ def make_magma_sigmas(sigma_sage):
 
 def make_search_data(sigmas_new):
     group_id = magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
-    return ([el.cycle_type() for el in sigmas_new], group_id)
-
+    group_str = "%sT%s" % group_id
+    return {"group":group_str, "lambdas":[el.cycle_type() for el in sigmas_new]}
 
 #NEW (AFTER CODING SESSION ON MONDAY 05-10)
 def make_search_dicts(group_id, lambdas):
