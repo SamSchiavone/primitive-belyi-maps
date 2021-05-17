@@ -1,3 +1,8 @@
+def look_up_prim_labels(label):
+    import os
+    os.chdir("/scratch/home/ahoey/lmfdb")
+    from lmfdb import db
+
 def look_up_primitivization(record):
     d = record["deg"]    
 
@@ -7,12 +12,13 @@ def look_up_primitivization(record):
     sigmas_orig_magma = make_magma_sigmas(sigmas_orig, d)
 
     magma.load("primitivize.m")
-    sigmas_prim_magma = sigmas_prim = magma.Primitivize(sigmas_orig_magma)
+    sigmas_prim_magma = magma.Primitivize(sigmas_orig_magma)
     sigmas_prim = make_sage_sigmas(sigmas_prim_magma)
 
     #2) Make search dicts using primitivization
-    group_id = make_search_data(sigmas_prim)[1]
-    lambdas = make_search_data(sigmas_prim)[0]
+    search_data = make_search_data(sigmas_prim, d)
+    group_id = search_data[1]
+    lambdas = search_data[0]
     search_dicts = make_search_dicts(group_id, lambdas)
 
     #3) Find primitivization's record -- requires are_conjugate to work
@@ -25,20 +31,22 @@ def make_sage_sigmas(magma_sigmas):
     return sigmas_new
 
 #Here, sigma_sage is formatted as [Permutation, Permutation, Permutation]
-def make_magma_sigmas(sigma_sage):
+def make_magma_sigmas(sigma_sage, d):
     """
     Input: a list of 3 (Sage) permutations
     Output: a Magma object of the 3 permutations
     """
-    S = sigma_sage[0].parent()
-    d = S.degree()
+    #S = sigma_sage[0].parent()
+    #d = S.degree()
     magma_string = '[Sym(%s) | %s, %s, %s]' % (d, sigma_sage[0], sigma_sage[1], sigma_sage[2])
     return magma(magma_string)
 
-def make_search_data(sigmas_new):
+def make_search_data(sigmas_new, d):
+    mag_str = 'sub< Sym(%s) | %s>' % (d,sigmas_new)
+    G = magma(mag_str) 
     group_id = magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
     group_str = "%sT%s" % group_id
-    return ([el.cycle_type() for el in sigmas_new], group_id)
+    return ([el.cycle_type() for el in sigmas_new], group_str)
 
 #NEW (AFTER CODING SESSION ON MONDAY 05-10)
 def make_search_dicts(group_id, lambdas):
