@@ -95,3 +95,9 @@ def are_conjugate(triples, sigmas_prim, d):
     if val != "true":
         return False
     return True
+
+def write_primitive(rec):
+    prim_label = look_up_primitivization(rec)
+
+    jobs = open(primitive_results.txt)
+    jobs.write('{f_in} | {f_out}\n'.format(f_in = label, f_out = prim_label))
