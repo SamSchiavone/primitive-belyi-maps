@@ -109,9 +109,10 @@ def find_prim_record(search_dicts, sigmas_prim, d):
         possible_records = list(db.belyi_galmaps.search(D))
         print("number of possible matches = %s" % len(possible_records))
         for rec in possible_records:
-            triples = rec['triples'][0]
-            if are_conjugate(triples, sigmas_prim, d): #??
-                return rec
+            #triples = rec['triples'][0] 
+            for triple in rec['triples']:
+                if are_conjugate(triple, sigmas_prim, d): #??
+                    return (rec, triple)
 
 def are_conjugate(triples, sigmas_prim, d):
     """
