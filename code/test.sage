@@ -7,7 +7,8 @@ load("lookup.sage")
 import os
 os.chdir("/scratch/home/sschiavo/github/lmfdb")
 from lmfdb import db
-rec = db.belyi_galmaps.lucky({'deg':6})
-print("finding primitivization for %s" % rec['label'])
+#rec = db.belyi_galmaps.lucky({'deg':6})
+#rec = db.belyi_galmaps.lookup("8T17-8_4.4_4.1.1.1.1-a")
+rec = db.belyi_galmaps.lookup("9T13-6.3_6.3_3.3.1.1.1-a")
 rec_prim = look_up_primitivization(rec)
 print("primitivization = %s" % rec_prim['label'])

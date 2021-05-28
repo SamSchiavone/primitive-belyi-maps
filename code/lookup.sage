@@ -6,12 +6,14 @@ def look_up_prim_labels(label):
 def look_up_primitivization(record):
     d = record["deg"]    
     S = SymmetricGroup(d)
+    print("finding primitivization for %s" % record['label'])
 
     #1) Compute primitivization (using Katie's Magma code)
     sigmas_orig_str = record["triples"][0]
     sigmas_orig = [S(elt) for elt in sigmas_orig_str]
     print("original triple = %s" % sigmas_orig)
     sigmas_orig_magma = make_magma_sigmas(sigmas_orig, d)
+    print("original triple magma = %s" % sigmas_orig_magma)
 
     magma.load("primitivize.m") # do we need to change directory here?
     sigmas_prim_magma = magma.Primitivize(sigmas_orig_magma, nvals=2)
@@ -20,12 +22,13 @@ def look_up_primitivization(record):
     sigmas_prim_magma = sigmas_prim_magma[0]
     if prim_bool: # if original record was primitive, just return it
         return record
-    #print("magma sigma_prim = %s" % sigmas_prim_magma) # printing
-    sigmas_prim = make_sage_sigmas(sigmas_prim_magma, d)
-    #print("sage sigma_prim = %s" % sigmas_prim) # printing
+    d_prim = magma.Degree(magma.Parent(sigmas_prim_magma[1]))
+    print("magma sigma_prim = %s" % sigmas_prim_magma) # printing
+    sigmas_prim = make_sage_sigmas(sigmas_prim_magma, d_prim)
+    print("sage sigma_prim = %s" % sigmas_prim) # printing
 
     #2) Make search dicts using primitivization
-    search_data = make_search_data(sigmas_prim, d)
+    search_data = make_search_data(sigmas_prim, d_prim)
     group_id = search_data[1]
     print("primitive group id = %s" % group_id)
     lambdas = search_data[0]
@@ -33,13 +36,19 @@ def look_up_primitivization(record):
     search_dicts = make_search_dicts(group_id, lambdas)
 
     #3) Find primitivization's record -- requires are_conjugate to work
-    new_rec = find_prim_record(search_dicts, sigmas_prim, d)
+    new_rec = find_prim_record(search_dicts, sigmas_prim, d_prim)
     return new_rec
 
 def make_sage_sigmas(magma_sigmas, d):
     S = SymmetricGroup(d)
     sigma_list = list(magma_sigmas)
-    sigmas_new = [S(str(el)) for el in sigma_list]
+    sigmas_new = []
+    for el in sigma_list:
+        if str(el) == 'Id($)': # deal with identity
+            sigmas_new.append(S([]))
+        else:
+            sigmas_new.append(S(str(el)))
+    #sigmas_new = [S(str(el)) for el in sigma_list]
     return sigmas_new
 
 #Here, sigma_sage is formatted as [Permutation, Permutation, Permutation]
@@ -50,12 +59,18 @@ def make_magma_sigmas(sigma_sage, d):
     """
     #S = sigma_sage[0].parent()
     #d = S.degree()
-    magma_string = '[Sym(%s) | %s, %s, %s]' % (d, sigma_sage[0], sigma_sage[1], sigma_sage[2])
+    sigma_clean = []
+    for el in sigma_sage:
+        if str(el) == "()": # deal with identity
+            sigma_clean.append("1")
+        else:
+            sigma_clean.append(str(el))
+    magma_string = '[Sym(%s) | %s, %s, %s]' % (d, sigma_clean[0], sigma_clean[1], sigma_clean[2])
     return magma(magma_string)
 
 def make_search_data(sigmas_new, d):
-    mag_str = 'sub< Sym(%s) | %s>' % (d, sigmas_new)
-    #mag_str = 'sub< Sym(%s) | %s, %s, %s >' % (d, sigmas_new[0], sigmas_new[1], sigmas_new[2])
+    sigma_mag = make_magma_sigmas(sigmas_new, d)
+    mag_str = 'sub< Sym(%s) | %s, %s, %s>' % (d, sigma_mag[1], sigma_mag[2], sigma_mag[3])
     G = magma(mag_str) 
     group_id = magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
     group_str = "%sT%s" % (group_id[1], group_id[0])
