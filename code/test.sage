@@ -8,4 +8,6 @@ import os
 os.chdir("/scratch/home/sschiavo/github/lmfdb")
 from lmfdb import db
 rec = db.belyi_galmaps.lucky({'deg':6})
+print("finding primitivization for %s" % rec['label'])
 rec_prim = look_up_primitivization(rec)
+print("primitivization = %s" % rec_prim['label'])

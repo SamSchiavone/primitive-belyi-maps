@@ -10,16 +10,26 @@ def look_up_primitivization(record):
     #1) Compute primitivization (using Katie's Magma code)
     sigmas_orig_str = record["triples"][0]
     sigmas_orig = [S(elt) for elt in sigmas_orig_str]
+    print("original triple = %s" % sigmas_orig)
     sigmas_orig_magma = make_magma_sigmas(sigmas_orig, d)
 
     magma.load("primitivize.m") # do we need to change directory here?
-    sigmas_prim_magma = magma.Primitivize(sigmas_orig_magma)
+    sigmas_prim_magma = magma.Primitivize(sigmas_orig_magma, nvals=2)
+    prim_bool = sigmas_prim_magma[1]
+    prim_bool = (str(prim_bool) == "true")
+    sigmas_prim_magma = sigmas_prim_magma[0]
+    if prim_bool: # if original record was primitive, just return it
+        return record
+    #print("magma sigma_prim = %s" % sigmas_prim_magma) # printing
     sigmas_prim = make_sage_sigmas(sigmas_prim_magma, d)
+    #print("sage sigma_prim = %s" % sigmas_prim) # printing
 
     #2) Make search dicts using primitivization
     search_data = make_search_data(sigmas_prim, d)
     group_id = search_data[1]
+    print("primitive group id = %s" % group_id)
     lambdas = search_data[0]
+    print("primitive partitions = %s" % lambdas)
     search_dicts = make_search_dicts(group_id, lambdas)
 
     #3) Find primitivization's record -- requires are_conjugate to work
@@ -48,7 +58,7 @@ def make_search_data(sigmas_new, d):
     #mag_str = 'sub< Sym(%s) | %s, %s, %s >' % (d, sigmas_new[0], sigmas_new[1], sigmas_new[2])
     G = magma(mag_str) 
     group_id = magma.TransitiveGroupIdentification(G, nvals=2) # use this to get transitive group number
-    group_str = "%sT%s" % group_id
+    group_str = "%sT%s" % (group_id[1], group_id[0])
     return ([list(el.cycle_type()) for el in sigmas_new], group_str)
 
 #NEW (AFTER CODING SESSION ON MONDAY 05-10)
@@ -82,6 +92,7 @@ def find_prim_record(search_dicts, sigmas_prim, d):
 
     for D in search_dicts:
         possible_records = list(db.belyi_galmaps.search(D))
+        print("number of possible matches = %s" % len(possible_records))
         for rec in possible_records:
             triples = rec['triples'][0]
             if are_conjugate(triples, sigmas_prim, d): #??
