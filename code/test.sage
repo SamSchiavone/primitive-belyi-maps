@@ -8,13 +8,13 @@ import os
 os.chdir("/scratch/home/sschiavo/github/lmfdb")
 from lmfdb import db
 #rec = db.belyi_galmaps.lucky({'deg':6})
-#rec = db.belyi_galmaps.lookup("8T17-8_4.4_4.1.1.1.1-a")
-#rec = db.belyi_galmaps.lookup("9T13-6.3_6.3_3.3.1.1.1-a")
-#rec = db.belyi_galmaps.lookup("9T26-8.1_3.3.1.1.1_6.3-a")
-#rec = db.belyi_galmaps.lookup("9T30-9_4.3.2_2.2.2.2.1-a")
-rec = db.belyi_galmaps.lookup("8T16-8_8_2.2.1.1.1.1-a")
-prim = look_up_primitivization(rec)
-rec_prim = prim[0]
-sigma_prim = prim[1]
-print("primitivization = %s" % rec_prim['label'])
-print('sigma_prim = %s' % sigma_prim)
+#label = "8T17-8_4.4_4.1.1.1.1-a"
+#label = "9T13-6.3_6.3_3.3.1.1.1-a"
+#label = "9T26-8.1_3.3.1.1.1_6.3-a"
+#label = "9T30-9_4.3.2_2.2.2.2.1-a"
+#label = "8T16-8_8_2.2.1.1.1.1-a"
+#label = "8T16-8_8_2.2.1.1.1.1-a"
+label = "4T2-2.2_2.2_2.2-a"
+rec = db.belyi_galmaps.lookup(label)
+prim_label = look_up_primitivization(rec)
+print(prim_label)

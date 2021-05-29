@@ -1,9 +1,15 @@
-def look_up_prim_labels(label):
-    import os
-    os.chdir("/scratch/home/ahoey/lmfdb")
-    from lmfdb import db
+#def look_up_prim_labels(label):
+#    import os
+#    os.chdir("/scratch/home/ahoey/lmfdb")
+#    from lmfdb import db
 
-def look_up_primitivization(record):
+def look_up_primitivization(record, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
+#def look_up_primitivization(label, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
+    #import os
+    #os.chdir(path_to_lmfdb)
+    #from lmfdb import db    
+    #record = db.belyi_galmaps.lookup(label)
+
     d = record["deg"]    
     S = SymmetricGroup(d)
     print("finding primitivization for %s" % record['label'])
@@ -21,7 +27,7 @@ def look_up_primitivization(record):
     prim_bool = (str(prim_bool) == "true")
     sigmas_prim_magma = sigmas_prim_magma[0]
     if prim_bool: # if original record was primitive, just return it
-        return record
+        return record['label']
     d_prim = magma.Degree(magma.Parent(sigmas_prim_magma[1]))
     print("magma sigma_prim = %s" % sigmas_prim_magma) # printing
     sigmas_prim = make_sage_sigmas(sigmas_prim_magma, d_prim)
@@ -36,8 +42,8 @@ def look_up_primitivization(record):
     search_dicts = make_search_dicts(group_id, lambdas)
 
     #3) Find primitivization's record -- requires are_conjugate to work
-    new_rec = find_prim_record(search_dicts, sigmas_prim, d_prim)
-    return new_rec
+    prim_label = find_prim_record(search_dicts, sigmas_prim, d_prim, path_to_lmfdb=path_to_lmfdb)
+    return prim_label
 
 def make_sage_sigmas(magma_sigmas, d):
     S = SymmetricGroup(d)
@@ -92,27 +98,32 @@ def make_search_dicts(group_id, lambdas):
     return L
 
 
-def find_prim_record(search_dicts, sigmas_prim, d):
+def find_prim_record(search_dicts, sigmas_prim, d, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
     """
     Input search_dicts (list of search dicts as in make_search_dicts),
         sigmas_prim (desired triple, in [] permutation notation),
         d where the symmetric group of sigmas_prim is S_d
     Returns corresponding record
     """
-    #open lmfdb -- only works on my computer though
+    # open lmfdb
     import os
     #os.chdir("/scratch/home/ahoey/lmfdb")
-    os.chdir("/scratch/home/sschiavo/github/lmfdb")
+    os.chdir(path_to_lmfdb)
     from lmfdb import db    
 
+    print("primitive triple = %s", sigmas_prim)
     for D in search_dicts:
+        print("dict = %s", D)
         possible_records = list(db.belyi_galmaps.search(D))
         print("number of possible matches = %s" % len(possible_records))
+        found_bool = False
         for rec in possible_records:
             #triples = rec['triples'][0] 
             for triple in rec['triples']:
+                print("lmfdb triple = %s", triple)
                 if are_conjugate(triple, sigmas_prim, d): #??
-                    return (rec, triple)
+                    #return (rec, triple)
+                    return rec['label']
 
 def are_conjugate(triples, sigmas_prim, d):
     """
@@ -127,7 +138,17 @@ def are_conjugate(triples, sigmas_prim, d):
         return False
     return True
 
-#def write_primitive(rec):
-#    prim_label = look_up_primitivization(rec)
-#    jobs = open('primitive_results.txt')
-#    jobs.write('{f_in} | {f_out}\n'.format(f_in = label, f_out = prim_label))
+def write_primitive(rec, f, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
+    results = open(f, 'a')
+    prim_label = look_up_primitivization(rec, path_to_lmfdb=path_to_lmfdb)
+    results.write('{f_in}|{f_out}\n'.format(f_in = rec['label'], f_out = prim_label))
+
+def compute_primitivizations(f, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
+    import os
+    orig = os.getcwd()
+    os.chdir(path_to_lmfdb)
+    from lmfdb import db    
+    recs = db.belyi_galmaps.search()
+    for rec in recs:
+        os.chdir(orig)
+        write_primitive(rec, f, path_to_lmfdb=path_to_lmfdb)
