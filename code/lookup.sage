@@ -97,7 +97,6 @@ def make_search_dicts(group_id, lambdas):
         L.append({"group": group_id, "lambdas":perm})
     return L
 
-
 def find_prim_record(search_dicts, sigmas_prim, d, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
     """
     Input search_dicts (list of search dicts as in make_search_dicts),
@@ -121,7 +120,7 @@ def find_prim_record(search_dicts, sigmas_prim, d, path_to_lmfdb="/scratch/home/
             #triples = rec['triples'][0] 
             for triple in rec['triples']:
                 print("lmfdb triple = %s", triple)
-                if are_conjugate(triple, sigmas_prim, d): #??
+                if are_conjugate_lax(triple, sigmas_prim, d): #??
                     #return (rec, triple)
                     return rec['label']
 
@@ -137,6 +136,27 @@ def are_conjugate(triples, sigmas_prim, d):
     if val != "true":
         return False
     return True
+
+def S3_action(s, sigma):
+    S = sigma[0].parent()
+    sigmap = [sigma[s.dict()[i]] for i in range(0,3)]
+    if s.sign() == -1:
+        sigmap = [el.inverse() for el in sigmap]
+    assert sigmap[2]*sigmap[1]*sigmap[0] == S(1)
+    return sigmap
+
+def make_S3_orbit(sigma):
+    sigmas = []
+    S = SymmetricGroup([0,1,2])
+    for s in S:
+        sigmas.append(S3_action(s, sigma))
+    return sigmas
+
+def are_conjugate_lax(triples, sigmas_prim, d):
+    sigmas_orb = make_S3_orbit(sigmas_prim)
+    for sigma in sigmas_orb:
+        if are_conjugate(triples, sigma, d):
+            return True
 
 def write_primitive(rec, f, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
     results = open(f, 'a')
