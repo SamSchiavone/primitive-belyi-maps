@@ -1,4 +1,6 @@
-label|primitive_label
+label|primitivization
+text|text
+
 1T1-1_1_1-a|1T1-1_1_1-a
 2T1-2_2_1.1-a|2T1-2_2_1.1-a
 3T1-3_3_1.1.1-a|3T1-3_3_1.1.1-a
