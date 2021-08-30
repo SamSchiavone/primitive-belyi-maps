@@ -8,7 +8,7 @@ def look_up_primitivization(record, path_to_lmfdb="/scratch/home/sschiavo/github
     #import os
     #os.chdir(path_to_lmfdb)
     #from lmfdb import db    
-    #record = db.belyi_galmaps.lookup(label)
+    #record = db.belyi_galmaps_more.lookup(label)
 
     d = record["deg"]    
     S = SymmetricGroup(d)
@@ -113,7 +113,7 @@ def find_prim_record(search_dicts, sigmas_prim, d, path_to_lmfdb="/scratch/home/
     print("primitive triple = %s", sigmas_prim)
     for D in search_dicts:
         print("dict = %s", D)
-        possible_records = list(db.belyi_galmaps.search(D))
+        possible_records = list(db.belyi_galmaps_more.search(D))
         print("number of possible matches = %s" % len(possible_records))
         found_bool = False
         for rec in possible_records:
@@ -126,7 +126,7 @@ def find_prim_record(search_dicts, sigmas_prim, d, path_to_lmfdb="/scratch/home/
 
 def are_conjugate(triples, sigmas_prim, d):
     """
-    Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps), d = degree
+    Input triples, sigmas_prim (notation of triples[0] in db.belyi_galmaps_more), d = degree
     Returns True if conjugate, False else
     """	
     #S = sigmas_prim[0].parent()
@@ -168,7 +168,7 @@ def compute_primitivizations(f, path_to_lmfdb="/scratch/home/sschiavo/github/lmf
     orig = os.getcwd()
     os.chdir(path_to_lmfdb)
     from lmfdb import db    
-    recs = db.belyi_galmaps.search()
+    recs = db.belyi_galmaps_more.search()
     for rec in recs:
         os.chdir(orig)
         write_primitive(rec, f, path_to_lmfdb=path_to_lmfdb)
