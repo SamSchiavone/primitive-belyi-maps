@@ -163,6 +163,7 @@ def write_primitive(rec, f, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb")
       prim_label = look_up_primitivization(rec, path_to_lmfdb=path_to_lmfdb)
       results.write('{f_in}|{f_out}\n'.format(f_in = rec['label'], f_out = prim_label))
 
+# top-level function
 def compute_primitivizations(f, path_to_lmfdb="/scratch/home/sschiavo/github/lmfdb"):
     import os
     orig = os.getcwd()
